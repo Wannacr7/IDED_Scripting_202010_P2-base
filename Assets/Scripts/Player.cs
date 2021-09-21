@@ -14,10 +14,7 @@ public class Player : MonoBehaviour
 
     private float hVal;
 
-    #region ScoreManager
-    [SerializeField]
-    private int scoreAdd = 10;
-    #endregion
+
 
     #region Bullet
 
@@ -70,9 +67,9 @@ public class Player : MonoBehaviour
 
     #endregion MovementProperties
 
-    public static Action OnPlayerDied;
-    public static Action OnPlayerScoreChanged;
-    public static Action OnPlayerHit;
+    public static Action<bool> OnPlayerDied;
+    public static Action<int> OnPlayerScoreChanged;
+    public static Action<int> OnPlayerHit;
 
     // Start is called before the first frame update
     private void Start()
@@ -124,22 +121,22 @@ public class Player : MonoBehaviour
         OnPlayerHit -= ManageLife;
     }
 
-    private void ManageScore()
+    private void ManageScore(int _amount)
     {
         if (this != null)
         {
-            Score = scoreAdd;
+            Score += _amount;
         }
     }
-    private void ManageLife()
+    private void ManageLife(int _noLive)
     {
         if (this != null)
         {
-            Lives -= 1;
+            Lives -= _noLive;
 
             if (Lives <= 0 && OnPlayerDied != null)
             {
-                OnPlayerDied?.Invoke();
+                OnPlayerDied(true);
             }
         }
         

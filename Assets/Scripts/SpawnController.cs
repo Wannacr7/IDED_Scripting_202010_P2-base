@@ -2,6 +2,8 @@
 
 public class SpawnController : MonoBehaviour
 {
+    private bool endGame = false;
+
     [SerializeField]
     private GameObject[] spawnObjects;
 
@@ -44,7 +46,8 @@ public class SpawnController : MonoBehaviour
     }
     private void OnEnable()
     {
-        Player.OnPlayerDied += StopSpawning;
+        if(!endGame) Player.OnPlayerDied += StopSpawning;
+
     }
     private void OnDisable()
     {
@@ -63,8 +66,10 @@ public class SpawnController : MonoBehaviour
         }
     }
 
-    private void StopSpawning()
+    private void StopSpawning(bool _endgame)
     {
+        endGame = _endgame;
+        
         CancelInvoke();
     }
 }

@@ -4,7 +4,10 @@ using UnityEngine.UI;
 
 public class UIController : MonoBehaviour
 {
-    private Player playerRef;
+    //private Player playerRef;
+    [SerializeField]private int livecount = 0;
+    private int scoreCount = 0;
+    private bool endGame = false;
 
     [SerializeField]
     private Image[] lifeImages;
@@ -27,13 +30,6 @@ public class UIController : MonoBehaviour
     private void Start()
     {
         ToggleRestartButton(false);
-
-        playerRef = FindObjectOfType<Player>();
-
-        if (playerRef != null && lifeImages.Length == Player.PLAYER_LIVES)
-        {
-            InvokeRepeating("UpdateUI", 0F, tickRate);
-        }
     }
 
     private void ToggleRestartButton(bool val)
@@ -44,31 +40,45 @@ public class UIController : MonoBehaviour
         }
     }
 
-    private void UpdateUI()
+    private void OnEnable()
     {
-        for (int i = 0; i < lifeImages.Length; i++)
-        {
-            if (lifeImages[i] != null && lifeImages[i].enabled)
-            {
-                lifeImages[i].gameObject.SetActive(playerRef.Lives >= i + 1);
-            }
-        }
+        Player.OnPlayerHit += CountLive;
+        Player.OnPlayerScoreChanged += CountScore;
+        Player.OnPlayerDied += SetEndGame;
+
+    }
+    private void OnDisable()
+    {
+        Player.OnPlayerHit -= CountLive;
+        Player.OnPlayerScoreChanged -= CountScore;
+        Player.OnPlayerDied += SetEndGame;
+    }
+    private void CountLive(int _live)
+    {
+        livecount += _live;
+        if(!endGame)lifeImages[livecount-1].gameObject.SetActive(false);
+
+    }
+    private void CountScore(int _score)
+    {
+        scoreCount += _score;
 
         if (scoreLabel != null)
         {
-            scoreLabel.text = playerRef.Score.ToString();
+            scoreLabel.text = scoreCount.ToString();
         }
+    }
+    private void SetEndGame(bool _endGame)
+    {
+        endGame = _endGame;
 
-        if (playerRef.Lives <= 0)
+        //CancelInvoke();
+
+        if (scoreLabel != null)
         {
-            CancelInvoke();
-
-            if (scoreLabel != null)
-            {
-                scoreLabel.text = "Game Over";
-            }
-
-            ToggleRestartButton(true);
+            scoreLabel.text = "Game Over";
         }
+
+        ToggleRestartButton(true);
     }
 }

@@ -8,6 +8,11 @@ public class Target : MonoBehaviour
     [SerializeField]
     private int maxHP = 1;
 
+    #region ScoreManager
+    [SerializeField]
+    private int scoreAdd;
+    #endregion
+
     private int currentHP;
 
     //[SerializeField]
@@ -31,14 +36,15 @@ public class Target : MonoBehaviour
 
             if (currentHP <= 0)
             {
-                Player.OnPlayerScoreChanged?.Invoke();
+                if(Player.OnPlayerScoreChanged != null) Player.OnPlayerScoreChanged(scoreAdd);
+
                 Destroy(gameObject);
             }
         }
         else if (collidedObjectLayer.Equals(Utils.PlayerLayer) ||
             collidedObjectLayer.Equals(Utils.KillVolumeLayer))
         {
-            Player.OnPlayerHit?.Invoke();
+            if (Player.OnPlayerHit != null) Player.OnPlayerHit(1);
             Destroy(gameObject);
         }
     }
