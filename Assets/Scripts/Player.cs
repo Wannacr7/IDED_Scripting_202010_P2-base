@@ -14,6 +14,11 @@ public class Player : MonoBehaviour
 
     private float hVal;
 
+    #region ScoreManager
+    [SerializeField]
+    private int scoreAdd = 10;
+    #endregion
+
     #region Bullet
 
     [Header("Bullet")]
@@ -65,7 +70,9 @@ public class Player : MonoBehaviour
 
     #endregion MovementProperties
 
-    public Action OnPlayerDied;
+    public static Action OnPlayerDied;
+    public static Action OnPlayerScoreChanged;
+    public static Action OnPlayerHit;
 
     // Start is called before the first frame update
     private void Start()
@@ -105,5 +112,36 @@ public class Player : MonoBehaviour
                    .AddForce(transform.up * bulletSpeed, ForceMode.Impulse);
             }
         }
+    }
+    private void OnEnable()
+    {
+        OnPlayerScoreChanged += ManageScore;
+        OnPlayerHit += ManageLife;
+    }
+    private void OnDisable()
+    {
+        OnPlayerScoreChanged -= ManageScore;
+        OnPlayerHit -= ManageLife;
+    }
+
+    private void ManageScore()
+    {
+        if (this != null)
+        {
+            Score = scoreAdd;
+        }
+    }
+    private void ManageLife()
+    {
+        if (this != null)
+        {
+            Lives -= 1;
+
+            if (Lives <= 0 && OnPlayerDied != null)
+            {
+                OnPlayerDied?.Invoke();
+            }
+        }
+        
     }
 }

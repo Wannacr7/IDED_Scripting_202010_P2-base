@@ -10,8 +10,8 @@ public class Target : MonoBehaviour
 
     private int currentHP;
 
-    [SerializeField]
-    private int scoreAdd = 10;
+    //[SerializeField]
+    //private int scoreAdd = 10;
 
     private void Start()
     {
@@ -31,31 +31,14 @@ public class Target : MonoBehaviour
 
             if (currentHP <= 0)
             {
-                Player player = FindObjectOfType<Player>();
-
-                if (player != null)
-                {
-                    player.Score += scoreAdd;
-                }
-
+                Player.OnPlayerScoreChanged?.Invoke();
                 Destroy(gameObject);
             }
         }
         else if (collidedObjectLayer.Equals(Utils.PlayerLayer) ||
             collidedObjectLayer.Equals(Utils.KillVolumeLayer))
         {
-            Player player = FindObjectOfType<Player>();
-
-            if (player != null)
-            {
-                player.Lives -= 1;
-
-                if (player.Lives <= 0 && player.OnPlayerDied != null)
-                {
-                    player.OnPlayerDied();
-                }
-            }
-
+            Player.OnPlayerHit?.Invoke();
             Destroy(gameObject);
         }
     }
