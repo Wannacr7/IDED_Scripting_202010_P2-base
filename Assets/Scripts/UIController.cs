@@ -51,7 +51,7 @@ public class UIController : MonoBehaviour
     {
         Player.OnPlayerHit -= CountLive;
         Player.OnPlayerScoreChanged -= CountScore;
-        Player.OnPlayerDied += SetEndGame;
+        Player.OnPlayerDied -= SetEndGame;
     }
     private void CountLive(int _live)
     {
