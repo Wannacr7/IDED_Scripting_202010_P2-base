@@ -4,6 +4,9 @@
 public class Target : MonoBehaviour
 {
     private const float TIME_TO_DESTROY = 10F;
+    private TypeBullet thsBullet;
+
+    [SerializeField] private Collector returnPool;
 
     [SerializeField]
     private int maxHP = 1;
@@ -21,7 +24,9 @@ public class Target : MonoBehaviour
     private void Start()
     {
         currentHP = maxHP;
-        Destroy(gameObject, TIME_TO_DESTROY);
+        //Destroy(gameObject, TIME_TO_DESTROY);
+        thsBullet = gameObject.GetComponent<TypeBullet>();
+        InvokeRepeating("ColletObject", TIME_TO_DESTROY,1);
     }
 
     private void OnCollisionEnter(Collision collision)
@@ -30,7 +35,8 @@ public class Target : MonoBehaviour
 
         if (collidedObjectLayer.Equals(Utils.BulletLayer))
         {
-            Destroy(collision.gameObject);
+            //Destroy(collision.gameObject);
+            Collector.ReadyToBackPool(collision.gameObject);
 
             currentHP -= 1;
 
@@ -38,14 +44,24 @@ public class Target : MonoBehaviour
             {
                 if(Player.OnPlayerScoreChanged != null) Player.OnPlayerScoreChanged(scoreAdd);
 
-                Destroy(gameObject);
+                //Destroy(gameObject);
+                //Collector.ReadyToBackPool(gameObject);
+                ColletObject();
+
             }
         }
         else if (collidedObjectLayer.Equals(Utils.PlayerLayer) ||
             collidedObjectLayer.Equals(Utils.KillVolumeLayer))
         {
             if (Player.OnPlayerHit != null) Player.OnPlayerHit(1);
-            Destroy(gameObject);
+            //Destroy(gameObject);
+            ColletObject();
         }
+
+        
+    }
+    private void ColletObject()
+    {
+        Collector.ReadyToBackPool(gameObject);
     }
 }

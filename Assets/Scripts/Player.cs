@@ -19,8 +19,9 @@ public class Player : MonoBehaviour
     #region Bullet
 
     [Header("Bullet")]
-    [SerializeField]
-    private Rigidbody bullet;
+
+    [SerializeField]private BulletPool poolBullet;
+
 
     [SerializeField]
     private Transform bulletSpawnPoint;
@@ -63,7 +64,7 @@ public class Player : MonoBehaviour
     private bool ReachedRightBound { get => referencePointComponent >= rightCameraBound; }
     private bool ReachedLeftBound { get => referencePointComponent <= leftCameraBound; }
 
-    private bool CanShoot { get => bulletSpawnPoint != null && bullet != null; }
+    private bool CanShoot { get => bulletSpawnPoint != null && poolBullet != null; }
 
     #endregion MovementProperties
 
@@ -74,6 +75,9 @@ public class Player : MonoBehaviour
     // Start is called before the first frame update
     private void Start()
     {
+        OnPlayerScoreChanged += ManageScore;
+        OnPlayerHit += ManageLife;
+
         leftCameraBound = Camera.main.ViewportToWorldPoint(new Vector3(
             0F, 0F, 0F)).x + PLAYER_RADIUS;
 
@@ -104,17 +108,15 @@ public class Player : MonoBehaviour
             if ((Input.GetKeyDown(KeyCode.Space) || Input.GetMouseButtonDown(0))
                 && CanShoot)
             {
-                Instantiate<Rigidbody>
-                   (bullet, bulletSpawnPoint.position, bulletSpawnPoint.rotation)
-                   .AddForce(transform.up * bulletSpeed, ForceMode.Impulse);
+                GameObject bullet = poolBullet.GetBullet();
+                bullet.SetActive(true);
+                bullet.transform.position = bulletSpawnPoint.position;
+                bullet.GetComponent<Rigidbody>().AddForce(transform.up * bulletSpeed, ForceMode.Impulse);
+                
             }
         }
     }
-    private void OnEnable()
-    {
-        OnPlayerScoreChanged += ManageScore;
-        OnPlayerHit += ManageLife;
-    }
+
     private void OnDisable()
     {
         OnPlayerScoreChanged -= ManageScore;

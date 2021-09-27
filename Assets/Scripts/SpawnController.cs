@@ -2,10 +2,10 @@
 
 public class SpawnController : MonoBehaviour
 {
-    private bool endGame = false;
+    [SerializeField]private bool endGame = false;
 
     [SerializeField]
-    private GameObject[] spawnObjects;
+    private GameObject[] Pools;
 
     [SerializeField]
     private float spawnRate = 1f;
@@ -16,60 +16,62 @@ public class SpawnController : MonoBehaviour
     
     private Vector3 spawnPoint;
 
-    private bool IsThereAtLeastOneObjectToSpawn
-    {
-        get
-        {
-            bool result = false;
+    //private bool IsThereAtLeastOneObjectToSpawn
+    //{
+    //    get
+    //    {
+    //        bool result = false;
 
-            for (int i = 0; i < spawnObjects.Length; i++)
-            {
-                result = spawnObjects[i] != null;
+    //        for (int i = 0; i < Pools.Length; i++)
+    //        {
+    //            result = Pools[i] != null;
 
-                if (result)
-                {
-                    break;
-                }
-            }
+    //            if (result)
+    //            {
+    //                break;
+    //            }
+    //        }
 
-            return result;
-        }
-    }
+    //        return result;
+    //    }
+    //}
 
     // Start is called before the first frame update
-    private void Start()
+    private void Awake()
     {
-        if (spawnObjects.Length > 0 && IsThereAtLeastOneObjectToSpawn)
+        Player.OnPlayerDied += StopSpawning;
+        if (Pools.Length > 0)
         {
             InvokeRepeating("SpawnObject", firstSpawnDelay, spawnRate);
+            Debug.Log("Initialized");
         }
+       
     }
-    private void OnEnable()
-    {
-        if(!endGame) Player.OnPlayerDied += StopSpawning;
 
-    }
-    private void OnDisable()
-    {
-        Player.OnPlayerDied -= StopSpawning;
-    }
     private void SpawnObject()
     {
-        GameObject spawnGO = spawnObjects[Random.Range(0, spawnObjects.Length)];
-
-        if (spawnGO != null)
+        if (endGame==false)
         {
-            spawnPoint = Camera.main.ViewportToWorldPoint(new Vector3(
-                Random.Range(0F, 1F), 1F, transform.position.z));
-
-            GameObject instance = Instantiate(spawnGO, spawnPoint, Quaternion.identity);
+            spawnPoint = Camera.main.ViewportToWorldPoint(new Vector3(Random.Range(0F, 1F), 1F, transform.position.z));
+            GameObject temp = Pools[Random.Range(0, Pools.Length)].GetComponent<BulletPool>().GetBullet();
+            temp.transform.position = spawnPoint;
+            temp.SetActive(true);
+            Debug.Log("Spawn");
         }
+        else
+        {
+            Player.OnPlayerDied -= StopSpawning;
+        }
+        
+
+       
+
     }
 
-    private void StopSpawning(bool _endgame)
+    private void StopSpawning(bool _endGame)
     {
-        endGame = _endgame;
-        
-        CancelInvoke();
+        endGame = _endGame;
+        //CancelInvoke();
+
     }
 }

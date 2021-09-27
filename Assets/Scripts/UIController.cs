@@ -27,8 +27,12 @@ public class UIController : MonoBehaviour
     }
 
     // Start is called before the first frame update
-    private void Start()
+    private void Awake()
     {
+        Player.OnPlayerHit += CountLive;
+        Player.OnPlayerScoreChanged += CountScore;
+        Player.OnPlayerDied += SetEndGame;
+
         ToggleRestartButton(false);
     }
 
@@ -40,13 +44,7 @@ public class UIController : MonoBehaviour
         }
     }
 
-    private void OnEnable()
-    {
-        Player.OnPlayerHit += CountLive;
-        Player.OnPlayerScoreChanged += CountScore;
-        Player.OnPlayerDied += SetEndGame;
 
-    }
     private void OnDisable()
     {
         Player.OnPlayerHit -= CountLive;
